@@ -24,3 +24,4 @@ public class DashboardController {
         return ResponseEntity.ok(ApiResponse.ok("Dashboard metrics retrieved", stats));
     }
 }
+

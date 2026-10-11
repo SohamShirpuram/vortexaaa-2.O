@@ -41,3 +41,4 @@ public class AiSuggestionResponse {
     public String getEngineUsed() { return engineUsed; }
     public void setEngineUsed(String engineUsed) { this.engineUsed = engineUsed; }
 }
+

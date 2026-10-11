@@ -60,16 +60,21 @@ const GarbageTracker = {
     const van = this.vansData[this.activeVanIndex];
     if (!van) return;
 
-    // Update Details Cards
-    document.getElementById('van-number-display').textContent = van.vehicleNumber;
-    document.getElementById('van-driver-display').textContent = van.driverName + ' (' + van.contactPhone + ')';
-    document.getElementById('van-zone-display').textContent = van.assignedZone;
-    document.getElementById('van-speed-display').textContent = van.speedKmph.toFixed(1) + ' km/h';
-    document.getElementById('van-eta-display').textContent = van.nextStopEtaMinutes + ' mins';
-    document.getElementById('van-next-stop-display').textContent = van.nextStopLocality;
+    // Update Details Cards safely
+    const setSafe = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    setSafe('van-number-display', van.vehicleNumber);
+    setSafe('van-driver-display', van.driverName + ' (' + van.contactPhone + ')');
+    setSafe('van-zone-display', van.assignedZone);
+    setSafe('van-speed-display', van.speedKmph.toFixed(1) + ' km/h');
+    setSafe('van-eta-display', van.nextStopEtaMinutes + ' mins');
+    setSafe('van-next-stop-display', van.nextStopLocality);
     
     const timeStr = van.lastUpdatedAt ? new Date(van.lastUpdatedAt).toLocaleTimeString() : new Date().toLocaleTimeString();
-    document.getElementById('van-last-update').textContent = timeStr;
+    setSafe('van-last-update', timeStr);
 
     // Clear old stops & routes
     this.stopMarkers.forEach(m => this.map.removeLayer(m));
@@ -260,3 +265,4 @@ const GarbageTracker = {
     }
   }
 };
+

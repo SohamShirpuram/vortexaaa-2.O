@@ -57,3 +57,4 @@ public class AiController {
         return ResponseEntity.ok(ApiResponse.ok("Pending AI recommendations awaiting human review", list));
     }
 }
+

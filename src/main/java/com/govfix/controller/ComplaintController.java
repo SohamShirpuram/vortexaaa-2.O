@@ -192,3 +192,4 @@ public class ComplaintController {
         return auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
     }
 }
+

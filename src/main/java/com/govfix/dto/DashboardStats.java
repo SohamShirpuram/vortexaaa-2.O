@@ -46,3 +46,4 @@ public class DashboardStats {
     public Map<String, Long> getStatusBreakdown() { return statusBreakdown; }
     public void setStatusBreakdown(Map<String, Long> statusBreakdown) { this.statusBreakdown = statusBreakdown; }
 }
+

@@ -12,3 +12,4 @@ public interface GarbageVanRepository extends JpaRepository<GarbageVan, Long> {
     Optional<GarbageVan> findByVehicleNumber(String vehicleNumber);
     List<GarbageVan> findByAssignedZone(String assignedZone);
 }
+

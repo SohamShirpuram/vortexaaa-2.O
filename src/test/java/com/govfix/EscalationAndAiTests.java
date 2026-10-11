@@ -131,3 +131,4 @@ public class EscalationAndAiTests {
         assertEquals("Waste Management", missedGrievance.getDepartment());
     }
 }
+

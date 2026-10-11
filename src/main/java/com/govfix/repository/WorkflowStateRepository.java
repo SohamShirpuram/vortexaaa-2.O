@@ -12,3 +12,4 @@ public interface WorkflowStateRepository extends JpaRepository<WorkflowState, Lo
     List<WorkflowState> findByWorkflowIdOrderByStageOrderAsc(Long workflowId);
     Optional<WorkflowState> findByWorkflowIdAndStateKey(Long workflowId, String stateKey);
 }
+

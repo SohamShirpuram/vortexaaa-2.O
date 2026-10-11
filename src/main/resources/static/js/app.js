@@ -9,12 +9,151 @@ const App = {
   allOfficers: [],
 
   init() {
+    if (window.GovFixI18n) GovFixI18n.init();
+    if (window.GovFix3D) GovFix3D.init();
+    this.initAccessibility();
+    this.initGlobalSearch();
     this.initRoleSwitcher();
     this.initNavigation();
     this.initComplaintRegistration();
     this.initModals();
     this.initDemoControls();
     this.loadInitialData();
+  },
+
+  initAccessibility() {
+    const btnDecrease = document.getElementById('btn-font-decrease');
+    const btnNormal = document.getElementById('btn-font-normal');
+    const btnIncrease = document.getElementById('btn-font-increase');
+    const btnContrast = document.getElementById('btn-toggle-contrast');
+    const btnMotion = document.getElementById('btn-toggle-motion');
+
+    if (btnDecrease) {
+      btnDecrease.addEventListener('click', () => {
+        document.body.classList.remove('font-lg', 'font-xl');
+      });
+    }
+    if (btnNormal) {
+      btnNormal.addEventListener('click', () => {
+        document.body.classList.remove('font-lg', 'font-xl');
+      });
+    }
+    if (btnIncrease) {
+      btnIncrease.addEventListener('click', () => {
+        if (document.body.classList.contains('font-lg')) {
+          document.body.classList.remove('font-lg');
+          document.body.classList.add('font-xl');
+        } else {
+          document.body.classList.add('font-lg');
+        }
+      });
+    }
+    if (btnContrast) {
+      btnContrast.addEventListener('click', () => {
+        document.body.classList.toggle('high-contrast');
+      });
+    }
+    if (btnMotion) {
+      btnMotion.addEventListener('click', () => {
+        const isReduced = document.body.classList.toggle('reduced-motion');
+        if (window.GovFix3D) GovFix3D.setReducedMotion(isReduced);
+      });
+    }
+  },
+
+  initGlobalSearch() {
+    const searchInput = document.getElementById('global-search-input');
+    const searchBtn = document.getElementById('btn-global-search');
+    const autoBox = document.getElementById('search-autocomplete');
+
+    const searchCatalog = [
+      { label: 'Property Tax (Kar) Assessment & Payment', tag: 'Revenue', action: () => window.open('https://www.pcmcindia.gov.in/', '_blank') },
+      { label: 'Water Supply Pipeline Leakage & Grievance', tag: 'Grievance', action: () => this.openGrievanceWithCategory('Water supply') },
+      { label: 'Roads & Pothole Repair (Akurdi, Wakad, Nigdi)', tag: 'Grievance', action: () => this.openGrievanceWithCategory('Roads and potholes') },
+      { label: 'Smart Garbage Collection Van Live GPS Tracking', tag: 'Live GPS', action: () => this.switchTab('garbage-tracking') },
+      { label: 'Drainage & Open Manhole Reporting', tag: 'Grievance', action: () => this.openGrievanceWithCategory('Drainage and sanitation') },
+      { label: 'Streetlight Maintenance & Dark Spots', tag: 'Grievance', action: () => this.openGrievanceWithCategory('Streetlights') },
+      { label: 'Building Permission & BPMS Approvals', tag: 'Town Planning', action: () => window.open('https://www.pcmcindia.gov.in/', '_blank') },
+      { label: 'Public Gardens & Fallen Tree Trimming', tag: 'Grievance', action: () => this.openGrievanceWithCategory('Public gardens') },
+      { label: 'Track Existing Grievance Status (GV-1001)', tag: 'Tracking', action: () => this.switchTab('track') },
+      { label: 'Department Directory & Ward Offices A to H', tag: 'Directory', action: () => this.switchTab('departments') },
+      { label: 'City Grievance Performance Dashboard & Analytics', tag: 'Analytics', action: () => this.switchTab('dashboard') },
+      { label: 'PCMC Sarathi 24x7 Helpline & Emergency Contacts', tag: 'Contact', action: () => this.switchTab('contact') }
+    ];
+
+    if (!searchInput || !autoBox) return;
+
+    const handleSearch = (query) => {
+      query = (query || '').trim().toLowerCase();
+      if (!query) {
+        autoBox.classList.remove('active');
+        return;
+      }
+      const matches = searchCatalog.filter(item => 
+        item.label.toLowerCase().includes(query) || item.tag.toLowerCase().includes(query)
+      );
+
+      if (matches.length === 0) {
+        autoBox.innerHTML = `
+          <div style="padding:12px 18px; font-size:0.85rem; color:#64748b;">
+            No services matching "<strong>${this.escapeHtml(query)}</strong>". Try "pothole", "garbage", or "tax".
+          </div>
+        `;
+        autoBox.classList.add('active');
+        return;
+      }
+
+      autoBox.innerHTML = matches.slice(0, 6).map((item, idx) => `
+        <div class="search-suggestion-item" data-idx="${idx}">
+          <span><strong>${item.label}</strong></span>
+          <span style="font-size:0.75rem; background:#f1f5f9; padding:2px 8px; border-radius:4px; color:#475569;">${item.tag}</span>
+        </div>
+      `).join('');
+
+      autoBox.querySelectorAll('.search-suggestion-item').forEach((el) => {
+        el.addEventListener('click', () => {
+          const idx = parseInt(el.dataset.idx, 10);
+          autoBox.classList.remove('active');
+          searchInput.value = '';
+          matches[idx].action();
+        });
+      });
+
+      autoBox.classList.add('active');
+    };
+
+    searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+    if (searchBtn) {
+      searchBtn.addEventListener('click', () => handleSearch(searchInput.value));
+    }
+
+    // Quick search pills
+    document.querySelectorAll('.search-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const text = pill.dataset.search || pill.textContent;
+        searchInput.value = text;
+        handleSearch(text);
+      });
+    });
+
+    // Close autocomplete on click outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !autoBox.contains(e.target)) {
+        autoBox.classList.remove('active');
+      }
+    });
+  },
+
+  openGrievanceWithCategory(category) {
+    this.switchTab('citizen');
+    const catSelect = document.getElementById('reg-category');
+    if (catSelect) {
+      catSelect.value = category;
+    }
+    const titleInput = document.getElementById('reg-title');
+    if (titleInput) {
+      titleInput.focus();
+    }
   },
 
   initRoleSwitcher() {
@@ -65,15 +204,33 @@ const App = {
   },
 
   switchTab(tabId) {
+    if (tabId === 'track') {
+      this.activeTab = 'citizen';
+      document.querySelectorAll('.gov-subnav-item, .gov-nav-link').forEach(item => {
+        item.classList.toggle('active', item.dataset.target === 'track' || item.dataset.target === 'citizen');
+      });
+      document.querySelectorAll('.tab-view').forEach(view => {
+        view.classList.toggle('active', view.id === 'view-citizen');
+      });
+      const trackInput = document.getElementById('track-ticket-input');
+      if (trackInput) {
+        trackInput.scrollIntoView({ behavior: 'smooth' });
+        trackInput.focus();
+      }
+      return;
+    }
+
     this.activeTab = tabId;
 
-    document.querySelectorAll('.gov-subnav-item').forEach(item => {
+    document.querySelectorAll('.gov-subnav-item, .gov-nav-link').forEach(item => {
       item.classList.toggle('active', item.dataset.target === tabId);
     });
 
     document.querySelectorAll('.tab-view').forEach(view => {
       view.classList.toggle('active', view.id === `view-${tabId}`);
     });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Special view initializations
     if (tabId === 'garbage-tracking' && window.GarbageTracker) {
@@ -149,13 +306,24 @@ const App = {
   },
 
   renderStatsKPIs(stats) {
-    document.getElementById('kpi-total').textContent = stats.totalComplaints;
-    document.getElementById('kpi-pending').textContent = stats.pendingComplaints;
-    document.getElementById('kpi-assigned').textContent = stats.assignedComplaints;
-    document.getElementById('kpi-progress').textContent = stats.inProgressComplaints;
-    document.getElementById('kpi-resolved').textContent = stats.resolvedComplaints;
-    document.getElementById('kpi-overdue').textContent = stats.overdueComplaints;
-    document.getElementById('kpi-escalated').textContent = stats.escalatedComplaints;
+    const setEl = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val !== undefined && val !== null ? val : '0';
+    };
+
+    setEl('kpi-total', stats.totalComplaints);
+    setEl('kpi-pending', stats.pendingComplaints);
+    setEl('kpi-assigned', stats.assignedComplaints);
+    setEl('kpi-progress', stats.inProgressComplaints);
+    setEl('kpi-resolved', stats.resolvedComplaints);
+    setEl('kpi-overdue', stats.overdueComplaints);
+    setEl('kpi-escalated', stats.escalatedComplaints);
+
+    // Live City Statistics Strip in Landing/Hero
+    setEl('strip-total', stats.totalComplaints);
+    setEl('strip-progress', stats.inProgressComplaints);
+    setEl('strip-resolved', stats.resolvedComplaints);
+    setEl('strip-overdue', stats.overdueComplaints);
 
     // Badges in subnav
     const escBadge = document.getElementById('nav-escalation-badge');
@@ -924,3 +1092,4 @@ document.addEventListener('DOMContentLoaded', () => {
   window.App = App;
   App.init();
 });
+

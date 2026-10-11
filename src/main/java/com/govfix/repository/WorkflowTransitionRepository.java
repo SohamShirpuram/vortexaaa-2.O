@@ -13,3 +13,4 @@ public interface WorkflowTransitionRepository extends JpaRepository<WorkflowTran
     List<WorkflowTransition> findByWorkflowIdAndFromStateKey(Long workflowId, String fromStateKey);
     Optional<WorkflowTransition> findByWorkflowIdAndFromStateKeyAndToStateKey(Long workflowId, String fromStateKey, String toStateKey);
 }
+

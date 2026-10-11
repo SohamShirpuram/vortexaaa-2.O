@@ -13,3 +13,4 @@ public interface AuditEventRepository extends JpaRepository<AuditEvent, Long> {
     List<AuditEvent> findByTicketIdOrderByTimestampDesc(String ticketId);
     List<AuditEvent> findByOutcomeOrderByTimestampDesc(String outcome);
 }
+

@@ -167,3 +167,4 @@ GovFix has a comprehensive JUnit 5 test suite covering all core business logic:
 - **GPS Source:** Live vehicle tracking in this hackathon prototype uses high-fidelity mathematical route interpolation across Pimpri Chinchwad coordinates. A production deployment would bind to real AIS-140 PCMC telematics GPS feeds.
 - **AI Integration:** The AI Assistant includes an accurate built-in rule-based NLP classifier that operates out of the box with zero external dependencies. When `GEMINI_API_KEY` is provided in `.env`, it connects to Google Gemini for generative explanations.
 - **SMS / Push Alerts:** Citizen notifications are rendered via interactive in-app timelines; production integration would plug into PCMC's SMS gateway.
+

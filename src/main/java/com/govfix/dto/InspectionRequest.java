@@ -21,3 +21,4 @@ public class InspectionRequest {
     public String getEvidenceType() { return evidenceType; }
     public void setEvidenceType(String evidenceType) { this.evidenceType = evidenceType; }
 }
+

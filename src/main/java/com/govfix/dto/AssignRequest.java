@@ -17,3 +17,4 @@ public class AssignRequest {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }
+

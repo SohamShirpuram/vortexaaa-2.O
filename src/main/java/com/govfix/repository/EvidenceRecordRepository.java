@@ -12,3 +12,4 @@ public interface EvidenceRecordRepository extends JpaRepository<EvidenceRecord, 
     long countByComplaintIdAndEvidenceType(Long complaintId, String evidenceType);
     long countByComplaintId(Long complaintId);
 }
+

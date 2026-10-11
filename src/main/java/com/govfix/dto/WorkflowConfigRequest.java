@@ -95,3 +95,4 @@ public class WorkflowConfigRequest {
     public List<TransitionDto> getTransitions() { return transitions; }
     public void setTransitions(List<TransitionDto> transitions) { this.transitions = transitions; }
 }
+

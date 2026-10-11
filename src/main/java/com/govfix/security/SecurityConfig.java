@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/dashboard/stats").permitAll()
-                        .requestMatchers("/api/garbage-tracking/**").permitAll()
+                        .requestMatchers("/api/garbage-tracking/**", "/api/vehicles/**", "/api/waste-reports/**").permitAll()
                         .requestMatchers("/api/demo/**").permitAll()
 
                         // Role-specific API restrictions
@@ -61,3 +61,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+

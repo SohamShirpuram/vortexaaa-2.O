@@ -201,3 +201,4 @@ CREATE TABLE garbage_van_stops (
     estimated_arrival_minutes INT DEFAULT 15,
     CONSTRAINT fk_stop_van FOREIGN KEY (van_id) REFERENCES garbage_vans(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+

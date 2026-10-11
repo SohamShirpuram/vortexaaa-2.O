@@ -5,3 +5,4 @@ public class WorkflowException extends RuntimeException {
         super(message);
     }
 }
+

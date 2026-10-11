@@ -77,3 +77,4 @@ public class GarbageVanStop {
     public Integer getEstimatedArrivalMinutes() { return estimatedArrivalMinutes; }
     public void setEstimatedArrivalMinutes(Integer estimatedArrivalMinutes) { this.estimatedArrivalMinutes = estimatedArrivalMinutes; }
 }
+

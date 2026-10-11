@@ -46,3 +46,4 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
                                     @Param("priority") String priority,
                                     @Param("locality") String locality);
 }
+

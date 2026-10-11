@@ -77,3 +77,4 @@ public class WorkflowState {
     public String getColorCode() { return colorCode; }
     public void setColorCode(String colorCode) { this.colorCode = colorCode; }
 }
+

@@ -95,3 +95,4 @@ public class VanTrackingResponse {
     public boolean isSimulated() { return isSimulated; }
     public void setSimulated(boolean simulated) { isSimulated = simulated; }
 }
+

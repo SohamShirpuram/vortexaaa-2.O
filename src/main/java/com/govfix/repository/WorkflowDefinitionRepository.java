@@ -11,3 +11,4 @@ public interface WorkflowDefinitionRepository extends JpaRepository<WorkflowDefi
     Optional<WorkflowDefinition> findByWorkflowKey(String workflowKey);
     Optional<WorkflowDefinition> findFirstByCategoryPatternContainingIgnoreCase(String category);
 }
+

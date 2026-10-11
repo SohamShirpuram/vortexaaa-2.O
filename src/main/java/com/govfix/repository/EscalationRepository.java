@@ -12,3 +12,4 @@ public interface EscalationRepository extends JpaRepository<Escalation, Long> {
     List<Escalation> findAllByOrderByCreatedAtDesc();
     boolean existsByComplaintIdAndIsResolvedFalse(Long complaintId);
 }
+

@@ -28,3 +28,4 @@ public class AiSuggestionRequest {
     public Long getComplaintId() { return complaintId; }
     public void setComplaintId(Long complaintId) { this.complaintId = complaintId; }
 }
+

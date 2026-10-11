@@ -10,3 +10,4 @@ import java.util.List;
 public interface GarbageVanStopRepository extends JpaRepository<GarbageVanStop, Long> {
     List<GarbageVanStop> findByVanIdOrderByStopOrderAsc(Long vanId);
 }
+

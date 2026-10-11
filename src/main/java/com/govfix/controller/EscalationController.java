@@ -42,3 +42,4 @@ public class EscalationController {
         return ResponseEntity.ok(ApiResponse.ok("Complaint manually escalated to supervisor review", esc));
     }
 }
+

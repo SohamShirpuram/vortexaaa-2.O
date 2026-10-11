@@ -7,162 +7,607 @@
   
   <!-- Leaflet CSS for Garbage Collection Van Live GPS Map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <!-- GovFix Stylesheet -->
+  <!-- GovFix Stylesheet (USA.gov inspired civic design system) -->
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
+  <!-- Skip Navigation for Accessibility / Screen Readers -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Tricolor Accent Top Bar -->
   <div class="gov-tricolor-bar"></div>
 
-  <!-- Disclaimer Banner -->
-  <div class="gov-disclaimer-banner">
-    <div>
-      🛡️ <strong>HACKATHON PROTOTYPE</strong> — Inspired by PCMC Municipal Services (<a href="https://www.pcmcindia.gov.in/" target="_blank">pcmcindia.gov.in</a>). Fictional demo data & simulated deadlines.
-    </div>
-    <div style="font-size: 0.7rem; color: #94a3b8;">
-      Pimpri Chinchwad Municipal Area | Java 21 + Spring Boot 3 + MySQL 8
+  <!-- USA.gov-Style Official Prototype Banner -->
+  <div class="gov-official-banner">
+    <div class="gov-official-banner-content">
+      <div class="gov-banner-flag-text">
+        <span style="font-size:1.1rem;">🇮🇳</span>
+        <span data-i18n="banner_official" style="font-weight:600;">An Independent Municipal Civic Prototype for Pimpri-Chinchwad Municipal Area</span>
+        <span style="color:#64748b; font-size:0.75rem;">(Inspired by PCMC Municipal Services • <a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" style="color:var(--pcmc-blue-primary); text-decoration:underline;">pcmcindia.gov.in</a>)</span>
+      </div>
+      <div class="gov-banner-tools">
+        <!-- Accessibility Controls -->
+        <div style="display:flex; align-items:center; gap:4px;">
+          <span style="font-size:0.75rem; color:#64748b; margin-right:4px;">Text:</span>
+          <button type="button" class="access-tool-btn" id="btn-font-decrease" title="Decrease font size">A-</button>
+          <button type="button" class="access-tool-btn" id="btn-font-normal" title="Normal font size">A</button>
+          <button type="button" class="access-tool-btn" id="btn-font-increase" title="Increase font size">A+</button>
+        </div>
+        <button type="button" class="access-tool-btn" id="btn-toggle-contrast" title="Toggle High Contrast">Contrast</button>
+        <button type="button" class="access-tool-btn" id="btn-toggle-motion" title="Toggle Reduced Motion">Motion</button>
+        <!-- Bilingual English / Marathi Language Switcher -->
+        <button type="button" class="lang-toggle-btn" id="lang-toggle-btn">मराठी (MR)</button>
+      </div>
     </div>
   </div>
 
   <!-- Main Navigation Header -->
   <header class="gov-header">
-    <div class="gov-nav-container">
-      <div class="brand-wrapper" onclick="App.switchTab('landing')">
-        <div class="pcmc-emblem">PC</div>
-        <div class="brand-titles">
+    <div class="gov-header-inner">
+      <div class="gov-brand" onclick="App.switchTab('landing')">
+        <div class="gov-emblem-seal">PC</div>
+        <div class="gov-brand-text">
           <h1>Gov<span class="highlight">Fix</span></h1>
-          <p>PIMPRI CHINCHWAD CIVIC GRIEVANCE & WORKFLOW ENGINE</p>
+          <p data-i18n="site_title">SMART CIVIC SERVICES FOR PIMPRI-CHINCHWAD</p>
         </div>
       </div>
 
-      <div class="header-right-tools">
+      <div class="header-actions-group">
         <!-- Demo Role Switcher -->
-        <div class="role-switcher-card">
-          <div class="role-switcher-label">Simulated Role:</div>
-          <select id="global-role-select" class="role-select">
+        <div class="role-badge-panel">
+          <span style="font-size:0.75rem; color:#cbd5e1; font-weight:600;">Simulated Role:</span>
+          <select id="global-role-select" class="role-select-box">
             <option value="CITIZEN">CITIZEN (Rahul Deshmukh)</option>
             <option value="OFFICER">OFFICER (Amit Sharma - JE)</option>
             <option value="SUPERVISOR">SUPERVISOR (Dr. A. Kulkarni - EE)</option>
             <option value="ADMIN">ADMIN (System Administrator)</option>
             <option value="AUDITOR">AUDITOR (Vikas Joshi - Vigilance)</option>
           </select>
-          <span class="active-user-badge" id="current-user-display">Rahul Deshmukh</span>
+          <span class="active-user-badge" id="current-user-display" style="color:#38bdf8; font-size:0.8rem; font-weight:600;">Rahul Deshmukh</span>
         </div>
 
         <!-- Simulation Demo Buttons -->
-        <button id="btn-advance-time" class="btn-demo-action btn-demo-advance" title="Simulate passing of time to trigger SLA deadlines">
-          ⏱ Simulate Time Advance (+24h)
+        <button id="btn-advance-time" class="btn-header-action btn-advance-sim" title="Simulate passing of time to trigger SLA deadlines">
+          ⏱ Time +24h
         </button>
-        <button id="btn-reset-demo" class="btn-demo-action" title="Reset all data to fresh seed state">
+        <button id="btn-reset-demo" class="btn-header-action" title="Reset all data to fresh seed state">
           🔄 Reset Demo
         </button>
       </div>
     </div>
 
-    <!-- Navigation Bar Items -->
-    <nav class="gov-subnav">
-      <ul class="gov-subnav-list">
-        <li class="gov-subnav-item active" data-target="landing">🏛️ Home</li>
-        <li class="gov-subnav-item" data-target="dashboard">📊 Dashboard & KPIs</li>
-        <li class="gov-subnav-item" data-target="garbage-tracking" style="color:#2dd4bf;">🚛 Garbage Van Live Tracking <span class="badge-counter" style="background:#0f766e;">Featured</span></li>
-        <li class="gov-subnav-item" data-target="citizen">📝 Citizen Portal</li>
-        <li class="gov-subnav-item" data-target="officer">👷 Officer Workspace</li>
-        <li class="gov-subnav-item" data-target="supervisor">🚨 Supervisor & Escalations <span class="badge-counter badge-urgent" id="nav-escalation-badge">0</span></li>
-        <li class="gov-subnav-item" data-target="workflows">⚙️ Workflow Builder</li>
-        <li class="gov-subnav-item" data-target="audit">📜 Audit Logs</li>
-        <li class="gov-subnav-item" data-target="ai-assistant">🤖 AI Assistant</li>
+    <!-- Navigation Bar Items (USA.gov Information Architecture) -->
+    <nav class="gov-nav-bar">
+      <ul class="gov-nav-list">
+        <li class="gov-nav-link gov-subnav-item active" data-target="landing" data-i18n="nav_home">🏛️ Home</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="services" data-i18n="nav_services">📂 Citizen Services</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="garbage-tracking" style="color:#2dd4bf;" data-i18n="nav_garbage">🚛 Garbage Tracking <span class="badge-counter" style="background:#0f766e; color:white; font-size:0.65rem; padding:2px 6px; border-radius:10px;">Featured</span></li>
+        <li class="gov-nav-link gov-subnav-item" data-target="citizen" data-i18n="nav_grievances">📝 Grievances</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="track" data-i18n="nav_track">🔍 Track Ticket</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="departments" data-i18n="nav_directory">🏢 Departments</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="dashboard" data-i18n="nav_dashboard">📊 Dashboard</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="about" data-i18n="nav_about">ℹ️ About</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="contact" data-i18n="nav_contact">📞 Contact & Help</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="officer">👷 Officer</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="supervisor">🚨 Supervisor <span class="badge-counter badge-urgent" id="nav-escalation-badge">0</span></li>
+        <li class="gov-nav-link gov-subnav-item" data-target="workflows">⚙️ Workflows</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="audit">📜 Audit</li>
+        <li class="gov-nav-link gov-subnav-item" data-target="ai-assistant">🤖 AI Assistant</li>
       </ul>
     </nav>
   </header>
 
-  <!-- Main Views Container -->
-  <main class="gov-main-container">
+  <!-- Main Content Anchor -->
+  <main id="main-content">
 
     <!-- ========================================================
-         VIEW 1: LANDING PAGE
+         VIEW 1: LANDING PAGE (Hero, 3D City, Search, Services, Steps)
          ======================================================== -->
     <section id="view-landing" class="tab-view active">
-      <div class="hero-banner">
-        <div class="hero-content">
-          <span class="hero-pill">Configurable Municipal Governance</span>
-          <h2 class="hero-title">Smart & Accountable Civic Services for PCMC</h2>
-          <p class="hero-desc">
-            GovFix transforms municipal grievance resolution in Pimpri Chinchwad through state-machine workflow enforcement, role-based verifications, evidence-backed resolutions, automated SLA escalations, and live waste collection tracking.
-          </p>
-          <div class="hero-actions">
-            <button class="btn-primary" data-nav-target="citizen">📝 Report a Complaint</button>
-            <button class="btn-secondary" data-nav-target="garbage-tracking">🚛 Track Garbage Van Live</button>
-            <button class="btn-secondary" data-nav-target="dashboard">📊 View City Analytics</button>
+      <!-- Hero Section with USA.gov Search + 3D Cityscape -->
+      <div class="gov-hero-section">
+        <div class="gov-hero-container">
+          <div class="hero-text-block">
+            <span class="hero-tag-pill" data-i18n="hero_pill">Municipal Innovation Prototype • PCMC Inspiration</span>
+            <h1 class="hero-main-title" data-i18n="hero_title">Your City. Your Services. One Smarter Platform.</h1>
+            <p class="hero-subtitle-text" data-i18n="hero_desc">
+              Report civic issues, track municipal services and stay informed about your locality across Pimpri-Chinchwad.
+            </p>
+
+            <!-- Prominent USA.gov Style Search -->
+            <div class="gov-search-wrapper">
+              <input type="text" id="global-search-input" class="gov-search-input" placeholder="Search all civic services (e.g. property tax, water bill, pothole, garbage van)..." autocomplete="off" data-i18n="search_placeholder">
+              <button type="button" id="btn-global-search" class="gov-search-btn" data-i18n="search_btn">Search</button>
+              
+              <!-- Autocomplete Suggestion Dropdown -->
+              <div id="search-autocomplete" class="search-autocomplete-box"></div>
+            </div>
+
+            <!-- Quick Search Suggestion Pills -->
+            <div class="search-quick-pills">
+              <span>Popular:</span>
+              <span class="search-pill" data-search="Property Tax">Property Tax</span>
+              <span class="search-pill" data-search="Water Supply">Water Supply</span>
+              <span class="search-pill" data-search="Roads & Potholes">Roads & Potholes</span>
+              <span class="search-pill" data-search="Garbage Van Live">Garbage Van Live GPS</span>
+              <span class="search-pill" data-search="Streetlights">Streetlights</span>
+              <span class="search-pill" data-search="Drainage">Drainage</span>
+            </div>
+
+            <!-- Hero Action Buttons -->
+            <div class="hero-cta-buttons">
+              <button class="btn-cta-primary" data-nav-target="citizen" data-i18n="btn_report_issue">📝 Report a Civic Issue</button>
+              <button class="btn-cta-secondary" data-nav-target="garbage-tracking" data-i18n="btn_track_van">🚛 Track Garbage Collection</button>
+              <button class="btn-cta-secondary" data-nav-target="dashboard">📊 View City Analytics</button>
+            </div>
+          </div>
+
+          <!-- 3D City Illustration Container (Three.js) -->
+          <div class="hero-3d-wrapper">
+            <canvas id="hero-3d-canvas"></canvas>
+            <div class="hero-3d-badge">🏙️ 3D Civic Cityscape (Three.js)</div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Feature Access Grid -->
-      <div class="quick-feature-grid">
-        <div class="feature-box" data-nav-target="citizen">
-          <div>
-            <div class="feature-icon-wrapper icon-blue">📝</div>
-            <h3 class="feature-title">Citizen Grievance Portal</h3>
-            <p class="feature-desc">Report potholes, leaking water mains, or dark streetlights. Get unique tracking ticket IDs and live progress timelines.</p>
-          </div>
-          <span class="feature-link">Register Grievance →</span>
+      <!-- Live City Statistics Strip -->
+      <div class="city-stats-strip" style="margin-top: 28px;">
+        <div class="city-stat-box">
+          <div class="stat-label" data-i18n="stat_registered">Complaints Registered</div>
+          <div class="stat-value" id="strip-total">--</div>
+          <div class="stat-sub">Across all PCMC wards</div>
         </div>
-
-        <div class="feature-box" data-nav-target="garbage-tracking">
-          <div>
-            <div class="feature-icon-wrapper icon-teal">🚛</div>
-            <h3 class="feature-title">Smart Garbage Van Live Tracking</h3>
-            <p class="feature-desc">Monitor sanitation vehicles moving live through PCMC wards with dynamic ETAs, route stops, and 1-click missed collection reports.</p>
-          </div>
-          <span class="feature-link">Open Live GPS Map →</span>
+        <div class="city-stat-box stat-saffron">
+          <div class="stat-label" data-i18n="stat_in_progress">Cases In Progress</div>
+          <div class="stat-value" id="strip-progress">--</div>
+          <div class="stat-sub">Active field inspections</div>
         </div>
-
-        <div class="feature-box" data-nav-target="supervisor">
-          <div>
-            <div class="feature-icon-wrapper icon-amber">🚨</div>
-            <h3 class="feature-title">Automated Deadline Escalation</h3>
-            <p class="feature-desc">Stage-aware deadlines prevent complaints from languishing. Breaches automatically escalate cases directly to executive engineers.</p>
-          </div>
-          <span class="feature-link">Supervisor Monitoring →</span>
+        <div class="city-stat-box stat-green">
+          <div class="stat-label" data-i18n="stat_resolved">Resolved with Evidence</div>
+          <div class="stat-value" id="strip-resolved">--</div>
+          <div class="stat-sub">Verified closure</div>
         </div>
-
-        <div class="feature-box" data-nav-target="ai-assistant">
-          <div>
-            <div class="feature-icon-wrapper icon-purple">🤖</div>
-            <h3 class="feature-title">AI Triage with Human Approval</h3>
-            <p class="feature-desc">Instant category and department classification with human approval boundaries to ensure accountable decisions.</p>
-          </div>
-          <span class="feature-link">Review AI Suggestions →</span>
+        <div class="city-stat-box stat-red">
+          <div class="stat-label" data-i18n="stat_overdue">Overdue SLAs</div>
+          <div class="stat-value" id="strip-overdue">--</div>
+          <div class="stat-sub">Automated escalations</div>
+        </div>
+        <div class="city-stat-box">
+          <div class="stat-label" data-i18n="stat_vans">Active Garbage Vans</div>
+          <div class="stat-value" id="strip-vans">4</div>
+          <div class="stat-sub">Live GPS broadcast</div>
         </div>
       </div>
 
-      <!-- PCMC Civic Services Reference Grid -->
+      <!-- Section: 8 Distinct Image-Led Service Cards -->
+      <div class="section-heading-block" style="margin-top: 40px;">
+        <h2 class="section-title" data-i18n="sec_quick_services">Explore Municipal Services</h2>
+        <p class="section-desc" data-i18n="sec_quick_services_desc">Direct access to Pimpri-Chinchwad civic amenities and municipal grievance redressing</p>
+      </div>
+
+      <div class="services-image-grid">
+        <!-- 1. Property Tax -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80" alt="Property Tax Assessment">
+            <span class="service-card-tag">Revenue & Kar</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_tax_title">Property Tax (Kar)</h3>
+              <p class="service-card-text" data-i18n="srv_tax_desc">Self-assessment, tax rebate lookup and official PCMC payment portal redirection.</p>
+            </div>
+            <a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" class="service-card-action-btn">
+              Access PCMC Portal ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. Water Supply -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb186f5f8?w=600&auto=format&fit=crop&q=80" alt="Water Supply and Pipeline">
+            <span class="service-card-tag">Water Works</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_water_title">Water Supply (Pani Puravatha)</h3>
+              <p class="service-card-text" data-i18n="srv_water_desc">Pipeline leakage reporting, contaminated water grievances and supply schedules.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.openGrievanceWithCategory('Water supply')">
+              Report Water Issue →
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Roads & Potholes -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80" alt="Roads and Pothole Repair">
+            <span class="service-card-tag">Civil Works</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_roads_title">Roads & Pothole Repair</h3>
+              <p class="service-card-text" data-i18n="srv_roads_desc">Report asphalt craters, dangerous road depressions, broken dividers or BRTS corridor issues.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.openGrievanceWithCategory('Roads and potholes')">
+              Report Road Hazard →
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Waste Management & Live Van Tracking -->
+        <div class="service-card-item" style="border-color:var(--pcmc-teal);">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=80" alt="Solid Waste Management">
+            <span class="service-card-tag" style="background:#0f766e;">Featured Live GPS</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_waste_title">Solid Waste Management</h3>
+              <p class="service-card-text" data-i18n="srv_waste_desc">Door-to-door collection grievances, overflowing bin alerts and live vehicle GPS monitoring.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.switchTab('garbage-tracking')">
+              Track Garbage Van Live 🚛 →
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Drainage & Sanitation -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80" alt="Drainage and Sanitation">
+            <span class="service-card-tag">Public Health</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_drainage_title">Drainage & Sanitation</h3>
+              <p class="service-card-text" data-i18n="srv_drainage_desc">Open manhole hazards, stormwater drainage choking and sewer overflow reporting.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.openGrievanceWithCategory('Drainage and sanitation')">
+              Report Drainage Issue →
+            </button>
+          </div>
+        </div>
+
+        <!-- 6. Streetlight Maintenance -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1508873696983-2df570464756?w=600&auto=format&fit=crop&q=80" alt="Streetlight Maintenance">
+            <span class="service-card-tag">Electrical</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_lights_title">Streetlight Maintenance</h3>
+              <p class="service-card-text" data-i18n="srv_lights_desc">Dark street safety hazards, damaged electric poles and non-functional LED fixtures.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.openGrievanceWithCategory('Streetlights')">
+              Report Dark Streetlight →
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. Building & BPMS Approvals -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80" alt="Building and Town Planning Approvals">
+            <span class="service-card-tag">Town Planning</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_permits_title">Building & BPMS Approvals</h3>
+              <p class="service-card-text" data-i18n="srv_permits_desc">Town planning layouts, occupancy certificates and building permission verification.</p>
+            </div>
+            <a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" class="service-card-action-btn">
+              Open BPMS Portal ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- 8. Gardens & Tree Trimming -->
+        <div class="service-card-item">
+          <div class="service-card-image-box">
+            <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&auto=format&fit=crop&q=80" alt="Gardens and Parks">
+            <span class="service-card-tag">Horticulture</span>
+          </div>
+          <div class="service-card-body">
+            <div>
+              <h3 class="service-card-title" data-i18n="srv_gardens_title">Gardens & Tree Trimming</h3>
+              <p class="service-card-text" data-i18n="srv_gardens_desc">Fallen tree branch clearing, municipal park maintenance and playground repairs.</p>
+            </div>
+            <button type="button" class="service-card-action-btn" onclick="App.openGrievanceWithCategory('Public gardens')">
+              Report Garden Issue →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Step Animated Process Section -->
+      <div class="process-steps-section">
+        <h3 style="font-size: 1.35rem; font-weight:800; color:var(--pcmc-navy);">How GovFix Ensures Verified Resolution</h3>
+        <p style="font-size: 0.9rem; color: #64748b; margin-top: 4px;">A transparent, evidence-backed workflow for every citizen complaint</p>
+        
+        <div class="process-steps-grid">
+          <div class="process-step-card">
+            <div class="step-num-bubble">1</div>
+            <h4 data-i18n="step1_title">1. Report an Issue</h4>
+            <p data-i18n="step1_desc">Submit your grievance with locality details, photo attachments, and AI-assisted classification.</p>
+          </div>
+          <div class="process-step-card">
+            <div class="step-num-bubble">2</div>
+            <h4 data-i18n="step2_title">2. Automated Assignment</h4>
+            <p data-i18n="step2_desc">Routed directly to the responsible junior engineer with configurable SLA deadlines.</p>
+          </div>
+          <div class="process-step-card">
+            <div class="step-num-bubble">3</div>
+            <h4 data-i18n="step3_title">3. Track with Evidence</h4>
+            <p data-i18n="step3_desc">Field inspections require mandatory notes & photographic proof before moving to resolved.</p>
+          </div>
+          <div class="process-step-card">
+            <div class="step-num-bubble">4</div>
+            <h4 data-i18n="step4_title">4. Review & Confirm</h4>
+            <p data-i18n="step4_desc">Citizens review the resolution evidence or request reopening if the work is inadequate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW: CITIZEN SERVICES (Full Catalog)
+         ======================================================== -->
+    <section id="view-services" class="tab-view">
       <div class="gov-card">
         <div class="gov-card-header">
-          <h3 class="gov-card-title">🏛️ PCMC Municipal Online Services Hub</h3>
-          <span style="font-size:0.8rem; color:#64748b;">Citizen Portal Integrations</span>
+          <div>
+            <h2 class="gov-card-title">📂 PCMC Citizen Services Catalog</h2>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:2px;">Complete index of municipal facilities, online applications, and redressing services</p>
+          </div>
+          <button class="btn-primary" data-nav-target="citizen">📝 Report a Complaint</button>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
-          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-            <div style="font-weight:700; color:var(--pcmc-navy);">🏠 Property Tax (Kar)</div>
-            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Online bill assessment, rebate status & e-receipt generation.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-top:16px;">
+          <div style="padding:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+            <h3 style="font-size:1.15rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:8px;">🏠 Revenue & Tax Services</h3>
+            <ul style="padding-left:20px; font-size:0.85rem; color:#475569; line-height:1.8;">
+              <li>Property Tax Payment & Bill Generation</li>
+              <li>Water Bill Payment & Meter Regularization</li>
+              <li>Trade License (Parvana) Registration</li>
+              <li>Market Rent & Municipal Shop Assessments</li>
+            </ul>
+            <div style="margin-top:14px;">
+              <a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" class="service-card-action-btn">Visit PCMC Revenue Desk ↗</a>
+            </div>
           </div>
-          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-            <div style="font-weight:700; color:var(--pcmc-navy);">💧 Water Supply (Pani Puravatha)</div>
-            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Meter readings, pipeline leakage redressal & billing.</p>
+
+          <div style="padding:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+            <h3 style="font-size:1.15rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:8px;">💧 Engineering & Infrastructure</h3>
+            <ul style="padding-left:20px; font-size:0.85rem; color:#475569; line-height:1.8;">
+              <li>Road Surface & Asphalt Pothole Repair</li>
+              <li>Drinking Water Pipeline Leakage & Contamination</li>
+              <li>Underground Stormwater Drainage & Manholes</li>
+              <li>Streetlight LED Fixtures & Electrical Safety</li>
+            </ul>
+            <div style="margin-top:14px;">
+              <button type="button" class="service-card-action-btn" onclick="App.switchTab('citizen')">File Engineering Grievance →</button>
+            </div>
           </div>
-          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-            <div style="font-weight:700; color:var(--pcmc-navy);">🏗️ Building Permissions (BPMS)</div>
-            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Town planning, layout sanctions & occupancy certificates.</p>
+
+          <div style="padding:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+            <h3 style="font-size:1.15rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:8px;">🚛 Solid Waste & Sanitation</h3>
+            <ul style="padding-left:20px; font-size:0.85rem; color:#475569; line-height:1.8;">
+              <li>Live Garbage Collection Van Tracking</li>
+              <li>Missed Door-to-Door Collection Redressal</li>
+              <li>Community Dustbin Clearance</li>
+              <li>Construction & Demolition Waste Removal</li>
+            </ul>
+            <div style="margin-top:14px;">
+              <button type="button" class="service-card-action-btn" onclick="App.switchTab('garbage-tracking')">Open Live GPS Tracker 🚛 →</button>
+            </div>
           </div>
-          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-            <div style="font-weight:700; color:var(--pcmc-navy);">📜 Birth & Death Registry</div>
-            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Vital statistics certificate download & ward corrections.</p>
+
+          <div style="padding:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+            <h3 style="font-size:1.15rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:8px;">📜 Vital Statistics & Health</h3>
+            <ul style="padding-left:20px; font-size:0.85rem; color:#475569; line-height:1.8;">
+              <li>Birth Certificate Issuance & Corrections</li>
+              <li>Death Certificate Registration</li>
+              <li>YCM Hospital & Municipal Dispensary Lookup</li>
+              <li>Public Health & Vector Disease Control</li>
+            </ul>
+            <div style="margin-top:14px;">
+              <a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" class="service-card-action-btn">Health & Vital Stats ↗</a>
+            </div>
           </div>
-          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-            <div style="font-weight:700; color:var(--pcmc-navy);">🏪 Trade Licenses (Parvana)</div>
-            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Shop act renewal & health hygiene clearance certificates.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW: DEPARTMENT DIRECTORY
+         ======================================================== -->
+    <section id="view-departments" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">🏢 PCMC Municipal Department Directory</h2>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:2px;">Key engineering divisions, public health directors, and administrative ward offices</p>
+          </div>
+          <span class="status-pill status-closed" style="background:var(--pcmc-navy); color:white;">PCMC Main Building, Pimpri</span>
+        </div>
+
+        <div class="dept-directory-grid">
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Civil Engineering (Roads & Infrastructure)</h3>
+            <div class="dept-head">Executive Engineer: Dr. Anand Kulkarni</div>
+            <div class="dept-contact">
+              📞 020-2742-5511 (Ext. 210)<br>
+              ✉️ roads.engineering@pcmcindia.gov.in<br>
+              📍 3rd Floor, Engineering Wing, PCMC HQ
+            </div>
+          </div>
+
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Water Supply & Drainage Department</h3>
+            <div class="dept-head">Superintending Engineer: Shri V. K. Patil</div>
+            <div class="dept-contact">
+              📞 020-2742-5512 (Ext. 305)<br>
+              ✉️ water.drainage@pcmcindia.gov.in<br>
+              📍 Sector 27, Nigdi Water Filtration Complex
+            </div>
+          </div>
+
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Solid Waste Management & Sanitation</h3>
+            <div class="dept-head">Chief Sanitation Officer: Smt. Sunita More</div>
+            <div class="dept-contact">
+              📞 020-2742-5515 (Ext. 401)<br>
+              ✉️ waste.sanitation@pcmcindia.gov.in<br>
+              📍 Health Department Building, Chinchwad
+            </div>
+          </div>
+
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Electrical & Streetlighting Division</h3>
+            <div class="dept-head">Junior Engineer (In-Charge): Amit Sharma</div>
+            <div class="dept-contact">
+              📞 020-2742-5518 (Ext. 115)<br>
+              ✉️ streetlights@pcmcindia.gov.in<br>
+              📍 Electrical Sub-Division, Akurdi
+            </div>
+          </div>
+
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Town Planning & BPMS Division</h3>
+            <div class="dept-head">Assistant Director of Town Planning</div>
+            <div class="dept-contact">
+              📞 020-2742-5520<br>
+              ✉️ townplanning@pcmcindia.gov.in<br>
+              📍 4th Floor, Main Administrative Building
+            </div>
+          </div>
+
+          <div class="dept-directory-card">
+            <h3 class="dept-title">Administrative Ward Offices (A to H)</h3>
+            <div class="dept-head">8 Zonal Assistant Commissioners</div>
+            <div class="dept-contact">
+              Ward A (Nigdi) • Ward B (Chinchwad) • Ward C (Bhosari)<br>
+              Ward D (Pimple Saudagar) • Ward E (Rahatani) • Ward F (Charholi)<br>
+              Ward G (Thergaon) • Ward H (Sangvi)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW: ABOUT GOVFIX
+         ======================================================== -->
+    <section id="view-about" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">ℹ️ About GovFix — Smart Civic Services</h2>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:2px;">Configurable Civic Grievance & Municipal Workflow Management Engine</p>
+          </div>
+          <span class="status-pill status-assigned">12-Hour Hackathon Prototype</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:24px; margin-top:16px;">
+          <div>
+            <h3 style="font-size:1.15rem; color:var(--pcmc-navy); font-weight:800; margin-bottom:10px;">The Problem & Our Solution</h3>
+            <p style="font-size:0.9rem; color:#334155; line-height:1.6; margin-bottom:14px;">
+              Municipal complaint portals often suffer from lack of accountability, where tickets are closed prematurely without verified proof, or left pending indefinitely when junior engineers face delays.
+            </p>
+            <p style="font-size:0.9rem; color:#334155; line-height:1.6; margin-bottom:16px;">
+              <strong>GovFix</strong> solves this by implementing a deterministic state-machine workflow engine coupled with role-enforced transitions, mandatory before-and-after photographic evidence, automatic SLA deadline escalations, and live GPS sanitation van tracking.
+            </p>
+
+            <h4 style="font-size:1rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:8px;">5 Core Proposed Improvements:</h4>
+            <ol style="padding-left:20px; font-size:0.88rem; color:#475569; line-height:1.8;">
+              <li><strong>Unified Citizen Dashboard:</strong> Single view combining real-time municipal grievance KPIs and service redirection.</li>
+              <li><strong>Smart Complaint Tracking:</strong> Visual lifecycle stepper tracking tickets from submission to closure.</li>
+              <li><strong>AI-Assisted Routing with Human Approval:</strong> Automated category and priority triage where decisions require officer sign-off.</li>
+              <li><strong>Automated SLA Deadline Escalation:</strong> Automated background triggers alerting executive engineers when stage deadlines expire.</li>
+              <li><strong>Verified Resolution & GPS Fleet Tracking:</strong> Mandatory field inspection proof and live vehicle route monitoring.</li>
+            </ol>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:20px;">
+            <h4 style="font-size:1rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:12px;">Technology Architecture</h4>
+            <ul style="list-style:none; font-size:0.85rem; color:#475569; line-height:2;">
+              <li>☕ <strong>Backend:</strong> Java 21, Spring Boot 3, Spring Web</li>
+              <li>🛡️ <strong>Security:</strong> Spring Security (Role-enforced API boundaries)</li>
+              <li>🗄️ <strong>Database:</strong> MySQL 8 / Persistent SQL Storage with JPA/Hibernate</li>
+              <li>🌐 <strong>Frontend:</strong> HTML5, CSS3, Vanilla JavaScript, Fetch API</li>
+              <li>🗺️ <strong>Maps:</strong> Leaflet + OpenStreetMap (Live GPS Simulation)</li>
+              <li>🎨 <strong>3D Graphics:</strong> Three.js (Procedural Civic Cityscape & Truck)</li>
+              <li>🏛️ <strong>Design System:</strong> Inspired by USA.gov & PCMC Guidelines</li>
+            </ul>
+
+            <div style="margin-top:20px; padding:12px; background:#fef3c7; border:1px solid #fde68a; border-radius:6px; font-size:0.75rem; color:#92400e;">
+              ⚠️ <strong>Disclaimer:</strong> GovFix is an independent hackathon prototype inspired by PCMC municipal services. It does not claim official government endorsement or live municipal server integration.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW: CONTACT & HELP
+         ======================================================== -->
+    <section id="view-contact" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">📞 Citizen Contact, Helplines & Support</h2>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:2px;">Get immediate municipal assistance, emergency contacts, or submit feedback</p>
+          </div>
+          <span class="status-pill status-resolved">24x7 Control Room Active</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:12px;">🚨 Emergency & Helpline Contacts</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="padding:14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+                <div style="font-weight:700; color:#166534;">PCMC Sarathi 24x7 Citizen Helpline</div>
+                <div style="font-size:1.15rem; font-weight:800; color:#15803d; margin:4px 0;">8888 00 6666 / 020-67333333</div>
+                <div style="font-size:0.75rem; color:#166534;">Toll-free citizen grievance and municipal service inquiry desk</div>
+              </div>
+
+              <div style="padding:14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px;">
+                <div style="font-weight:700; color:#1e40af;">Disaster Management Control Room</div>
+                <div style="font-size:1.15rem; font-weight:800; color:#1d4ed8; margin:4px 0;">020-27425511 / 020-27425512</div>
+                <div style="font-size:0.75rem; color:#1e40af;">Floods, water-logging, tree falls, and chemical incidents</div>
+              </div>
+
+              <div style="padding:14px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px;">
+                <div style="font-weight:700; color:#991b1b;">Fire Brigade & Emergency Services</div>
+                <div style="font-size:1.15rem; font-weight:800; color:#b91c1c; margin:4px 0;">101 / 020-27422222</div>
+                <div style="font-size:0.75rem; color:#991b1b;">Main Fire Station, Sant Tukaram Nagar, Pimpri</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--pcmc-navy); font-weight:700; margin-bottom:12px;">💬 Quick Inquiry / Assistance Request</h3>
+            <form onsubmit="event.preventDefault(); alert('Inquiry received! Our civic desk will follow up shortly.'); this.reset();">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" required placeholder="Enter your full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact Mobile / Email *</label>
+                <input type="text" class="form-control" required placeholder="Enter 10-digit mobile or email">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Inquiry / Question *</label>
+                <textarea class="form-control" rows="3" required placeholder="How can we assist you with PCMC municipal services?"></textarea>
+              </div>
+              <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Submit Inquiry</button>
+            </form>
           </div>
         </div>
       </div>
@@ -293,6 +738,15 @@
             </p>
           </div>
           <span class="status-pill status-resolved">GPS Simulation Active</span>
+        </div>
+
+        <!-- 3D Truck Model Showcase (Three.js) -->
+        <div class="truck-3d-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:0.9rem; font-weight:700; color:var(--pcmc-navy);">🚛 3D Sanitation Fleet Vehicle (Three.js)</div>
+            <span style="font-size:0.75rem; color:#64748b;">Interactive • Drag to Rotate</span>
+          </div>
+          <canvas id="truck-3d-canvas"></canvas>
         </div>
 
         <!-- Map Control Bar -->
@@ -741,26 +1195,73 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="gov-footer">
-    <div class="footer-content">
-      <div>
-        <strong style="color:white;">GovFix Civic Platform</strong> — Hackathon Prototype for Pimpri Chinchwad Municipal Services
-        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">
-          Built with Java 21, Spring Boot 3, Spring Data JPA, Spring Security, MySQL 8, Vanilla JS & Leaflet.
-        </div>
+  <!-- USA.gov-Style 4-Column Footer -->
+  <footer class="gov-main-footer">
+    <div class="footer-top-container">
+      <div class="footer-brand-col">
+        <h3>GovFix PCMC</h3>
+        <p>
+          Smart & Accountable Civic Grievance Management and Workflow Platform. Designed to bring radical transparency and verifiable closure to municipal service delivery across Pimpri-Chinchwad.
+        </p>
+        <p style="margin-top:12px; font-size:0.75rem; color:#64748b;">
+          Inspired by Pimpri Chinchwad Municipal Corporation (<a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener" style="color:#38bdf8;">pcmcindia.gov.in</a>).
+        </p>
       </div>
-      <div style="text-align:right;">
-        <span class="status-pill status-closed" style="background:#0f766e; color:white;">System Operational</span>
+
+      <div class="footer-col">
+        <h4>Citizen Services</h4>
+        <ul>
+          <li><a href="#" onclick="App.switchTab('citizen'); return false;">Report Pothole Grievance</a></li>
+          <li><a href="#" onclick="App.switchTab('garbage-tracking'); return false;">Track Garbage Van Live</a></li>
+          <li><a href="#" onclick="App.switchTab('services'); return false;">Water Supply & Pipeline</a></li>
+          <li><a href="#" onclick="App.switchTab('services'); return false;">Streetlight Maintenance</a></li>
+          <li><a href="https://www.pcmcindia.gov.in/" target="_blank" rel="noopener">Property Tax Portal ↗</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>PCMC Administration</h4>
+        <ul>
+          <li><a href="#" onclick="App.switchTab('departments'); return false;">Engineering Department</a></li>
+          <li><a href="#" onclick="App.switchTab('departments'); return false;">Health & Sanitation Division</a></li>
+          <li><a href="#" onclick="App.switchTab('departments'); return false;">Ward Offices (A to H)</a></li>
+          <li><a href="#" onclick="App.switchTab('contact'); return false;">Sarathi Citizen Helpline</a></li>
+          <li><a href="#" onclick="App.switchTab('contact'); return false;">Disaster Control Room</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Platform & Open Gov</h4>
+        <ul>
+          <li><a href="#" onclick="App.switchTab('dashboard'); return false;">City Grievance KPIs</a></li>
+          <li><a href="#" onclick="App.switchTab('workflows'); return false;">Configurable State Workflows</a></li>
+          <li><a href="#" onclick="App.switchTab('audit'); return false;">Public Audit Trail</a></li>
+          <li><a href="#" onclick="App.switchTab('ai-assistant'); return false;">AI Triage Engine</a></li>
+          <li><a href="#" onclick="App.switchTab('about'); return false;">About GovFix Architecture</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div>
+        © 2026 GovFix Prototype. Built with Java 21, Spring Boot 3, MySQL 8, Three.js & Leaflet. Fictional demo data.
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="status-pill status-closed" style="background:#0f766e; color:white; font-size:0.75rem;">Platform Operational</span>
+        <span>Independent Hackathon Project</span>
       </div>
     </div>
   </footer>
 
-  <!-- Leaflet JS CDN -->
+  <!-- Three.js CDN for Lightweight 3D Civic Visuals -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Leaflet JS CDN for Garbage Collection Van GPS Map -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   
-  <!-- GovFix Application Scripts -->
+  <!-- GovFix Modular Application Scripts -->
   <script src="/js/api.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/three-city.js"></script>
   <script src="/js/garbage-tracker.js"></script>
   <script src="/js/app.js"></script>
 </body>

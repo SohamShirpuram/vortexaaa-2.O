@@ -62,3 +62,4 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("System error: " + ex.getMessage()));
     }
 }
+

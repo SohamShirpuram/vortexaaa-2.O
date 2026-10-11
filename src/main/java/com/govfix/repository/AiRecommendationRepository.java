@@ -13,3 +13,4 @@ public interface AiRecommendationRepository extends JpaRepository<AiRecommendati
     Optional<AiRecommendation> findFirstByComplaintIdOrderByCreatedAtDesc(Long complaintId);
     List<AiRecommendation> findByStatusOrderByCreatedAtDesc(String status);
 }
+

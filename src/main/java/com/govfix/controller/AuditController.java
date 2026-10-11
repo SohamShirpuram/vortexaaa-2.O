@@ -29,3 +29,4 @@ public class AuditController {
         return ResponseEntity.ok(ApiResponse.ok("Audit records retrieved", logs));
     }
 }
+
