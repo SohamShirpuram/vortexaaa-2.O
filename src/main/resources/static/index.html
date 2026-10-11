@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovFix — Smart & Accountable Civic Services for PCMC</title>
+  
+  <!-- Leaflet CSS for Garbage Collection Van Live GPS Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- GovFix Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Tricolor Accent Top Bar -->
+  <div class="gov-tricolor-bar"></div>
+
+  <!-- Disclaimer Banner -->
+  <div class="gov-disclaimer-banner">
+    <div>
+      🛡️ <strong>HACKATHON PROTOTYPE</strong> — Inspired by PCMC Municipal Services (<a href="https://www.pcmcindia.gov.in/" target="_blank">pcmcindia.gov.in</a>). Fictional demo data & simulated deadlines.
+    </div>
+    <div style="font-size: 0.7rem; color: #94a3b8;">
+      Pimpri Chinchwad Municipal Area | Java 21 + Spring Boot 3 + MySQL 8
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="gov-header">
+    <div class="gov-nav-container">
+      <div class="brand-wrapper" onclick="App.switchTab('landing')">
+        <div class="pcmc-emblem">PC</div>
+        <div class="brand-titles">
+          <h1>Gov<span class="highlight">Fix</span></h1>
+          <p>PIMPRI CHINCHWAD CIVIC GRIEVANCE & WORKFLOW ENGINE</p>
+        </div>
+      </div>
+
+      <div class="header-right-tools">
+        <!-- Demo Role Switcher -->
+        <div class="role-switcher-card">
+          <div class="role-switcher-label">Simulated Role:</div>
+          <select id="global-role-select" class="role-select">
+            <option value="CITIZEN">CITIZEN (Rahul Deshmukh)</option>
+            <option value="OFFICER">OFFICER (Amit Sharma - JE)</option>
+            <option value="SUPERVISOR">SUPERVISOR (Dr. A. Kulkarni - EE)</option>
+            <option value="ADMIN">ADMIN (System Administrator)</option>
+            <option value="AUDITOR">AUDITOR (Vikas Joshi - Vigilance)</option>
+          </select>
+          <span class="active-user-badge" id="current-user-display">Rahul Deshmukh</span>
+        </div>
+
+        <!-- Simulation Demo Buttons -->
+        <button id="btn-advance-time" class="btn-demo-action btn-demo-advance" title="Simulate passing of time to trigger SLA deadlines">
+          ⏱ Simulate Time Advance (+24h)
+        </button>
+        <button id="btn-reset-demo" class="btn-demo-action" title="Reset all data to fresh seed state">
+          🔄 Reset Demo
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar Items -->
+    <nav class="gov-subnav">
+      <ul class="gov-subnav-list">
+        <li class="gov-subnav-item active" data-target="landing">🏛️ Home</li>
+        <li class="gov-subnav-item" data-target="dashboard">📊 Dashboard & KPIs</li>
+        <li class="gov-subnav-item" data-target="garbage-tracking" style="color:#2dd4bf;">🚛 Garbage Van Live Tracking <span class="badge-counter" style="background:#0f766e;">Featured</span></li>
+        <li class="gov-subnav-item" data-target="citizen">📝 Citizen Portal</li>
+        <li class="gov-subnav-item" data-target="officer">👷 Officer Workspace</li>
+        <li class="gov-subnav-item" data-target="supervisor">🚨 Supervisor & Escalations <span class="badge-counter badge-urgent" id="nav-escalation-badge">0</span></li>
+        <li class="gov-subnav-item" data-target="workflows">⚙️ Workflow Builder</li>
+        <li class="gov-subnav-item" data-target="audit">📜 Audit Logs</li>
+        <li class="gov-subnav-item" data-target="ai-assistant">🤖 AI Assistant</li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Views Container -->
+  <main class="gov-main-container">
+
+    <!-- ========================================================
+         VIEW 1: LANDING PAGE
+         ======================================================== -->
+    <section id="view-landing" class="tab-view active">
+      <div class="hero-banner">
+        <div class="hero-content">
+          <span class="hero-pill">Configurable Municipal Governance</span>
+          <h2 class="hero-title">Smart & Accountable Civic Services for PCMC</h2>
+          <p class="hero-desc">
+            GovFix transforms municipal grievance resolution in Pimpri Chinchwad through state-machine workflow enforcement, role-based verifications, evidence-backed resolutions, automated SLA escalations, and live waste collection tracking.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-primary" data-nav-target="citizen">📝 Report a Complaint</button>
+            <button class="btn-secondary" data-nav-target="garbage-tracking">🚛 Track Garbage Van Live</button>
+            <button class="btn-secondary" data-nav-target="dashboard">📊 View City Analytics</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Feature Access Grid -->
+      <div class="quick-feature-grid">
+        <div class="feature-box" data-nav-target="citizen">
+          <div>
+            <div class="feature-icon-wrapper icon-blue">📝</div>
+            <h3 class="feature-title">Citizen Grievance Portal</h3>
+            <p class="feature-desc">Report potholes, leaking water mains, or dark streetlights. Get unique tracking ticket IDs and live progress timelines.</p>
+          </div>
+          <span class="feature-link">Register Grievance →</span>
+        </div>
+
+        <div class="feature-box" data-nav-target="garbage-tracking">
+          <div>
+            <div class="feature-icon-wrapper icon-teal">🚛</div>
+            <h3 class="feature-title">Smart Garbage Van Live Tracking</h3>
+            <p class="feature-desc">Monitor sanitation vehicles moving live through PCMC wards with dynamic ETAs, route stops, and 1-click missed collection reports.</p>
+          </div>
+          <span class="feature-link">Open Live GPS Map →</span>
+        </div>
+
+        <div class="feature-box" data-nav-target="supervisor">
+          <div>
+            <div class="feature-icon-wrapper icon-amber">🚨</div>
+            <h3 class="feature-title">Automated Deadline Escalation</h3>
+            <p class="feature-desc">Stage-aware deadlines prevent complaints from languishing. Breaches automatically escalate cases directly to executive engineers.</p>
+          </div>
+          <span class="feature-link">Supervisor Monitoring →</span>
+        </div>
+
+        <div class="feature-box" data-nav-target="ai-assistant">
+          <div>
+            <div class="feature-icon-wrapper icon-purple">🤖</div>
+            <h3 class="feature-title">AI Triage with Human Approval</h3>
+            <p class="feature-desc">Instant category and department classification with human approval boundaries to ensure accountable decisions.</p>
+          </div>
+          <span class="feature-link">Review AI Suggestions →</span>
+        </div>
+      </div>
+
+      <!-- PCMC Civic Services Reference Grid -->
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <h3 class="gov-card-title">🏛️ PCMC Municipal Online Services Hub</h3>
+          <span style="font-size:0.8rem; color:#64748b;">Citizen Portal Integrations</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="font-weight:700; color:var(--pcmc-navy);">🏠 Property Tax (Kar)</div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Online bill assessment, rebate status & e-receipt generation.</p>
+          </div>
+          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="font-weight:700; color:var(--pcmc-navy);">💧 Water Supply (Pani Puravatha)</div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Meter readings, pipeline leakage redressal & billing.</p>
+          </div>
+          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="font-weight:700; color:var(--pcmc-navy);">🏗️ Building Permissions (BPMS)</div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Town planning, layout sanctions & occupancy certificates.</p>
+          </div>
+          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="font-weight:700; color:var(--pcmc-navy);">📜 Birth & Death Registry</div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Vital statistics certificate download & ward corrections.</p>
+          </div>
+          <div style="padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+            <div style="font-weight:700; color:var(--pcmc-navy);">🏪 Trade Licenses (Parvana)</div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">Shop act renewal & health hygiene clearance certificates.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 2: DASHBOARD & KPIS
+         ======================================================== -->
+    <section id="view-dashboard" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <h2 class="gov-card-title">📊 City-Wide Grievance Performance Dashboard</h2>
+          <span style="font-size:0.8rem; color:#64748b;">Real-time PCMC Municipal KPIs</span>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-card-header">Total Grievances</div>
+            <div class="kpi-number" id="kpi-total">0</div>
+            <div class="kpi-subtext">All registered cases</div>
+          </div>
+          <div class="kpi-card kpi-amber">
+            <div class="kpi-card-header">Pending Review</div>
+            <div class="kpi-number" id="kpi-pending">0</div>
+            <div class="kpi-subtext">Submitted & Under Review</div>
+          </div>
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-card-header">Assigned to Field</div>
+            <div class="kpi-number" id="kpi-assigned">0</div>
+            <div class="kpi-subtext">Allocated to Junior Engineers</div>
+          </div>
+          <div class="kpi-card kpi-orange">
+            <div class="kpi-card-header">In Active Progress</div>
+            <div class="kpi-number" id="kpi-progress">0</div>
+            <div class="kpi-subtext">Under site remediation</div>
+          </div>
+          <div class="kpi-card kpi-green">
+            <div class="kpi-card-header">Resolved & Verified</div>
+            <div class="kpi-number" id="kpi-resolved">0</div>
+            <div class="kpi-subtext">With evidence signoff</div>
+          </div>
+          <div class="kpi-card kpi-red">
+            <div class="kpi-card-header">Overdue SLAs</div>
+            <div class="kpi-number" id="kpi-overdue">0</div>
+            <div class="kpi-subtext">Past stage deadline</div>
+          </div>
+          <div class="kpi-card kpi-red">
+            <div class="kpi-card-header">Escalated Cases</div>
+            <div class="kpi-number" id="kpi-escalated">0</div>
+            <div class="kpi-subtext">Under Supervisor Review</div>
+          </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:20px;">
+          <h4 style="font-size:0.9rem; font-weight:700; color:var(--pcmc-navy); margin-bottom:12px;">Category Distribution & Volume</h4>
+          <div id="category-breakdown-bars"></div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-bar">
+          <input type="text" id="filter-locality" class="filter-input" placeholder="Search Locality (e.g. Nigdi, Wakad)..." oninput="App.loadDashboardData()">
+          <select id="filter-category" class="filter-select" onchange="App.loadDashboardData()">
+            <option value="">All Categories</option>
+            <option value="Roads and potholes">Roads and potholes</option>
+            <option value="Water supply">Water supply</option>
+            <option value="Drainage and sanitation">Drainage and sanitation</option>
+            <option value="Streetlights">Streetlights</option>
+            <option value="Waste management">Waste management</option>
+            <option value="Public gardens">Public gardens</option>
+          </select>
+          <select id="filter-status" class="filter-select" onchange="App.loadDashboardData()">
+            <option value="">All Workflow States</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Assigned">Assigned</option>
+            <option value="Inspection Required">Inspection Required</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolution Submitted">Resolution Submitted</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+            <option value="Escalated">Escalated</option>
+            <option value="Reopened">Reopened</option>
+          </select>
+          <select id="filter-priority" class="filter-select" onchange="App.loadDashboardData()">
+            <option value="">All Priorities</option>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+            <option value="CRITICAL">CRITICAL</option>
+          </select>
+        </div>
+
+        <!-- Complaints Table -->
+        <div class="gov-table-wrapper">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Complaint Title & Locality</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Current Status</th>
+                <th>Assigned Officer</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="complaints-table-body">
+              <tr><td colspan="7" style="text-align:center; padding:20px;">Loading grievances...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 3: SMART GARBAGE COLLECTION VAN LIVE TRACKING
+         (Featured PCMC Improvement Module)
+         ======================================================== -->
+    <section id="view-garbage-tracking" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">🚛 Smart Garbage Collection Van Live Tracking</h2>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">
+              Featured PCMC Improvement: GPS Vehicle Monitoring, Dynamic Arrival Estimates & Missed Pickup Grievance Redressal
+            </p>
+          </div>
+          <span class="status-pill status-resolved">GPS Simulation Active</span>
+        </div>
+
+        <!-- Map Control Bar -->
+        <div class="map-control-bar">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <label style="font-size:0.85rem; font-weight:700; color:var(--pcmc-navy);">Select Route / Zone:</label>
+            <select id="van-zone-select" class="filter-select"></select>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button id="btn-step-gps" class="btn-demo-action">⏭ Step Movement (Tick)</button>
+            <button id="btn-auto-sim" class="btn-primary" style="padding:6px 12px; font-size:0.85rem;">▶ Start Auto-Tracking (3s)</button>
+            <button id="btn-open-missed-report" class="btn-demo-action" style="background:#b91c1c; border-color:#dc2626; color:white;">
+              ⚠️ Report Missed Pickup
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Vehicle Status Highlight Bar -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Vehicle Reg No.</div>
+            <div style="font-size:1.05rem; font-weight:800; color:var(--pcmc-navy);" id="van-number-display">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Driver & Contact</div>
+            <div style="font-size:0.95rem; font-weight:700; color:var(--pcmc-navy);" id="van-driver-display">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Next Scheduled Stop</div>
+            <div style="font-size:0.95rem; font-weight:700; color:var(--pcmc-teal-dark);" id="van-next-stop-display">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Estimated Arrival (ETA)</div>
+            <div style="font-size:1.15rem; font-weight:800; color:#d97706;" id="van-eta-display">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Vehicle Speed</div>
+            <div style="font-size:1rem; font-weight:700; color:var(--pcmc-navy);" id="van-speed-display">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:10px 14px; border-radius:6px; border:1px solid #e2e8f0;">
+            <div style="font-size:0.75rem; color:#64748b;">Last GPS Heartbeat</div>
+            <div style="font-size:0.9rem; font-weight:700; color:#475569;" id="van-last-update">-</div>
+          </div>
+        </div>
+
+        <!-- Interactive Map Container -->
+        <div id="garbage-map"></div>
+
+        <!-- Route Stops Progression Bar -->
+        <div style="margin-top:16px;">
+          <h4 style="font-size:0.85rem; font-weight:700; color:#64748b; text-transform:uppercase;">Scheduled Stops & Collection Progress</h4>
+          <ul class="van-stop-timeline" id="van-stops-container"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 4: CITIZEN PORTAL (REGISTER & TRACK)
+         ======================================================== -->
+    <section id="view-citizen" class="tab-view">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <!-- Register Grievance Card -->
+        <div class="gov-card">
+          <div class="gov-card-header">
+            <h3 class="gov-card-title">📝 Register New Civic Grievance</h3>
+            <span style="font-size:0.8rem; color:#64748b;">Pimpri Chinchwad Municipal Area</span>
+          </div>
+
+          <form id="form-register-complaint">
+            <div class="form-group">
+              <label class="form-label">Complaint Title *</label>
+              <input type="text" id="reg-title" class="form-control" required placeholder="E.g. Severe deep crater pothole near Akurdi Railway Station">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Detailed Description *</label>
+              <textarea id="reg-desc" class="form-control" rows="3" required placeholder="Describe exact location, road condition, and risk to traffic/pedestrians..."></textarea>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <button type="button" id="btn-form-ai-suggest" class="btn-demo-action" style="color:#7c3aed; border-color:#c4b5fd;">
+                ✨ Auto-Categorize with AI
+              </button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Category *</label>
+                <select id="reg-category" class="form-control" required>
+                  <option value="Roads and potholes">Roads and potholes</option>
+                  <option value="Water supply">Water supply</option>
+                  <option value="Drainage and sanitation">Drainage and sanitation</option>
+                  <option value="Streetlights">Streetlights</option>
+                  <option value="Waste management">Waste management</option>
+                  <option value="Public gardens">Public gardens</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Locality / Area *</label>
+                <select id="reg-locality" class="form-control" required>
+                  <option value="Akurdi">Akurdi</option>
+                  <option value="Nigdi">Nigdi</option>
+                  <option value="Wakad">Wakad</option>
+                  <option value="Chinchwad">Chinchwad</option>
+                  <option value="Bhosari">Bhosari</option>
+                  <option value="Pimple Saudagar">Pimple Saudagar</option>
+                  <option value="Ravet">Ravet</option>
+                  <option value="Sangvi">Sangvi</option>
+                  <option value="Kasarwadi">Kasarwadi</option>
+                  <option value="Hinjawadi">Hinjawadi</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Ward / Zone</label>
+                <input type="text" id="reg-ward" class="form-control" placeholder="E.g. Ward 14 (Pradhikaran)">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Landmark</label>
+                <input type="text" id="reg-landmark" class="form-control" placeholder="E.g. Near Station Gate 2">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select id="reg-priority" class="form-control">
+                  <option value="LOW">LOW</option>
+                  <option value="MEDIUM" selected>MEDIUM</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Photo Attachment (URL)</label>
+                <input type="text" id="reg-photo-url" class="form-control" placeholder="https://... or sample URL" value="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Citizen Name</label>
+                <input type="text" id="reg-citizen-name" class="form-control" value="Rahul Deshmukh">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact Number</label>
+                <input type="text" id="reg-citizen-contact" class="form-control" value="9822012345">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">
+              Submit Grievance to PCMC
+            </button>
+          </form>
+        </div>
+
+        <!-- Track Complaint Card -->
+        <div>
+          <div class="gov-card">
+            <div class="gov-card-header">
+              <h3 class="gov-card-title">🔍 Track Existing Grievance</h3>
+              <span style="font-size:0.8rem; color:#64748b;">Instant Status & Timeline</span>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+              <input type="text" id="track-ticket-input" class="form-control" placeholder="Enter Ticket ID (e.g. GV-1001)">
+              <button id="btn-track-ticket" class="btn-primary" style="white-space:nowrap;">Track Status</button>
+            </div>
+            <p style="font-size:0.8rem; color:#64748b;">
+              Try demo tickets: <strong>GV-1001</strong> (Inspection Required), <strong>GV-1002</strong> (Overdue), <strong>GV-1005</strong> (Resolved with Evidence).
+            </p>
+          </div>
+
+          <div id="ticket-tracking-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 5: OFFICER WORKSPACE
+         ======================================================== -->
+    <section id="view-officer" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">👷 Field Officer Workspace & Inspections</h2>
+            <p style="font-size:0.8rem; color:#64748b;">Assigned Cases, Site Inspections & Evidence Recording</p>
+          </div>
+          <span class="status-pill status-assigned">Officer Mode</span>
+        </div>
+
+        <div class="gov-table-wrapper">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Title & Location</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Current Status</th>
+                <th>Officer</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="officer-table-body">
+              <tr><td colspan="7" style="text-align:center; padding:20px;">Loading officer cases...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 6: SUPERVISOR & ESCALATIONS
+         ======================================================== -->
+    <section id="view-supervisor" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">🚨 Supervisor Escalation & Reassignment Center</h2>
+            <p style="font-size:0.8rem; color:#64748b;">Overdue SLA Monitoring, Escalated Grievances & Quality Signoff</p>
+          </div>
+          <span class="status-pill status-escalated">Executive Engineer View</span>
+        </div>
+
+        <div class="gov-table-wrapper">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Title & Locality</th>
+                <th>Stage Status</th>
+                <th>Escalation State</th>
+                <th>Assigned Officer</th>
+                <th>Supervisor Actions</th>
+              </tr>
+            </thead>
+            <tbody id="supervisor-table-body">
+              <tr><td colspan="6" style="text-align:center; padding:20px;">Loading escalated cases...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 7: WORKFLOW BUILDER
+         ======================================================== -->
+    <section id="view-workflows" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">⚙️ Municipal Workflow Engine Configuration</h2>
+            <p style="font-size:0.8rem; color:#64748b;">Dynamic State Transitions, Permitted Roles, SLAs & Mandatory Evidence Rules</p>
+          </div>
+          <span class="status-pill status-closed">Admin Configurator</span>
+        </div>
+
+        <div id="workflow-list-container">
+          <div style="text-align:center; padding:20px;">Loading workflows...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 8: AUDIT LOGS
+         ======================================================== -->
+    <section id="view-audit" class="tab-view">
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <div>
+            <h2 class="gov-card-title">📜 Append-Only Municipal Audit Trail</h2>
+            <p style="font-size:0.8rem; color:#64748b;">Tamper-Resistant Log of Transitions, Authorizations & Rejected Attempts</p>
+          </div>
+          <span class="status-pill status-under-review">Auditor View</span>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" id="audit-ticket-filter" class="filter-input" placeholder="Filter by Ticket ID (e.g. GV-1001)..." oninput="App.loadAuditLogs()">
+          <select id="audit-outcome-filter" class="filter-select" onchange="App.loadAuditLogs()">
+            <option value="">All Outcomes</option>
+            <option value="SUCCESS">SUCCESS only</option>
+            <option value="REJECTED">REJECTED only (Violations)</option>
+          </select>
+        </div>
+
+        <div class="gov-table-wrapper">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Actor & Role</th>
+                <th>Ticket ID</th>
+                <th>Action</th>
+                <th>State Change</th>
+                <th>Outcome</th>
+                <th>Reason / Validation Diagnostics</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <tr><td colspan="7" style="text-align:center; padding:20px;">Loading audit trail...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 9: AI ASSISTANT
+         ======================================================== -->
+    <section id="view-ai-assistant" class="tab-view">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <!-- Test AI Triage -->
+        <div class="gov-card">
+          <div class="gov-card-header">
+            <h3 class="gov-card-title">🤖 AI Grievance Classification Engine</h3>
+            <span style="font-size:0.8rem; color:#64748b;">Rule-Based NLP + LLM</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Test Complaint Text</label>
+            <textarea id="ai-test-text" class="form-control" rows="4" placeholder="E.g. Contaminated yellowish water leaking from cracked pipeline near Nigdi Pradhikaran..."></textarea>
+          </div>
+          <button id="btn-test-ai" class="btn-primary" style="margin-bottom:16px;">Analyze & Classify</button>
+          <div id="ai-test-output"></div>
+        </div>
+
+        <!-- Pending Recommendations Queue -->
+        <div class="gov-card">
+          <div class="gov-card-header">
+            <h3 class="gov-card-title">⚖️ Human Approval Queue</h3>
+            <span style="font-size:0.8rem; color:#64748b;">Enforced Decision Boundary</span>
+          </div>
+          <p style="font-size:0.8rem; color:#64748b; margin-bottom:14px;">
+            AI never transitions complaints on its own. Every AI suggestion requires review and authorization by an officer or supervisor.
+          </p>
+          <div id="ai-pending-queue"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       MODAL: COMPLAINT DETAILS & TRANSITIONS
+       ======================================================== -->
+  <div id="modal-complaint-details" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span id="modal-ticket-status" class="status-pill status-submitted">Submitted</span>
+          <h3 id="modal-ticket-id" style="display:inline; margin-left:8px; font-weight:800;">GV-1001</h3>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <h4 id="modal-ticket-title" style="font-size:1.2rem; color:var(--pcmc-navy); margin-bottom:8px;">Complaint Title</h4>
+        <p id="modal-ticket-desc" style="font-size:0.9rem; color:#334155; margin-bottom:16px; line-height:1.5;">Complaint description...</p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; background:#f8fafc; padding:14px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:16px; font-size:0.85rem;">
+          <div>Category: <strong id="modal-ticket-category">-</strong></div>
+          <div>Department: <strong id="modal-ticket-dept">-</strong></div>
+          <div>Locality: <strong id="modal-ticket-locality">-</strong></div>
+          <div>Priority: <strong id="modal-ticket-priority">-</strong></div>
+          <div>Citizen: <strong id="modal-ticket-citizen">-</strong></div>
+          <div>Assigned Officer: <strong id="modal-ticket-officer">-</strong></div>
+          <div style="grid-column: span 2;">Stage Deadline: <strong id="modal-ticket-deadline" style="color:#0f766e;">-</strong></div>
+        </div>
+
+        <img id="modal-ticket-photo" src="" alt="Complaint photo" style="width:100%; max-height:220px; object-fit:cover; border-radius:8px; margin-bottom:16px; display:none;">
+
+        <!-- Evidence Box -->
+        <h5 style="font-size:0.85rem; font-weight:700; color:var(--pcmc-navy); margin-bottom:8px;">Recorded Evidence & Inspection Reports</h5>
+        <div id="modal-ticket-evidence" style="margin-bottom:20px;"></div>
+
+        <!-- Workflow Transitions Actions -->
+        <div style="background:#f0fdfa; border:1px solid #ccfbf1; padding:16px; border-radius:8px; margin-bottom:20px;">
+          <h5 style="font-size:0.9rem; font-weight:700; color:var(--pcmc-teal-dark); margin-bottom:8px;">Permitted Workflow Transitions (Based on Active Role)</h5>
+          <div id="modal-permitted-transitions" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+
+        <!-- Timeline Section -->
+        <h5 style="font-size:0.85rem; font-weight:700; color:var(--pcmc-navy); margin-bottom:10px;">Lifecycle Audit Trail</h5>
+        <ul id="modal-timeline-list" class="timeline-stepper"></ul>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-demo-action modal-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: REPORT MISSED GARBAGE COLLECTION
+       ======================================================== -->
+  <div id="modal-missed-collection" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width:540px;">
+      <div class="modal-header">
+        <h3>🚛 Report Missed Garbage Pickup</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-missed-collection">
+        <div class="modal-body">
+          <p style="font-size:0.85rem; color:#64748b; margin-bottom:16px;">
+            Submit an immediate grievance to the PCMC Waste Management department for an uncollected bin or missed street route.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Vehicle Number (if known)</label>
+            <input type="text" id="missed-van-number" class="form-control" placeholder="MH-14-GH-1001">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Locality / Street *</label>
+            <input type="text" id="missed-locality" class="form-control" required placeholder="E.g. Yamunanagar Sector 21">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Landmark</label>
+            <input type="text" id="missed-landmark" class="form-control" placeholder="E.g. Near Water Tank Chowk">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Citizen Name *</label>
+            <input type="text" id="missed-citizen-name" class="form-control" required value="Rahul Deshmukh">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Number *</label>
+            <input type="text" id="missed-citizen-contact" class="form-control" required value="9822012345">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Additional Notes</label>
+            <textarea id="missed-notes" class="form-control" rows="2" placeholder="Vehicle did not arrive at 9:00 AM scheduled slot..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-demo-action modal-close-btn">Cancel</button>
+          <button type="submit" class="btn-primary">Register Missed Pickup Grievance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="gov-footer">
+    <div class="footer-content">
+      <div>
+        <strong style="color:white;">GovFix Civic Platform</strong> — Hackathon Prototype for Pimpri Chinchwad Municipal Services
+        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">
+          Built with Java 21, Spring Boot 3, Spring Data JPA, Spring Security, MySQL 8, Vanilla JS & Leaflet.
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <span class="status-pill status-closed" style="background:#0f766e; color:white;">System Operational</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- GovFix Application Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/garbage-tracker.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
